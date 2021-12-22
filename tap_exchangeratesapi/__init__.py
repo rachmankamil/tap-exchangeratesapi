@@ -11,7 +11,7 @@ import copy
 
 from datetime import date, datetime, timedelta
 
-base_url = 'https://api.exchangeratesapi.io/v1/'
+base_url = 'api.exchangeratesapi.io/v1/'
 
 logger = singer.get_logger()
 session = requests.Session()
@@ -46,7 +46,7 @@ def request(url, params):
     response.raise_for_status()
     return response
     
-def do_sync(base, start_date, api_key):
+def do_sync(base, start_date, api_key, httpType):
     state = {'start_date': start_date}
     next_date = start_date
     prev_schema = {}
@@ -57,7 +57,7 @@ def do_sync(base, start_date, api_key):
                         next_date,
                         base)
 
-            response = request(base_url + next_date, {"base" : base , "access_key": api_key})
+            response = request(httpType + base_url + next_date, {"base" : base , "access_key": api_key})
             payload = response.json()
 
             # Update schema if new currency/currencies exist
@@ -115,8 +115,13 @@ def main():
     if api_key == '' :
         logger.fatal('Error on config, we need API_KEY.')
         sys.exit(-1)
+        
+    secure = config.get('secure',False)
+    httpType = "http://"
+    if secure :
+        httpType = "https://"
 
-    do_sync(config.get('base','EUR'), start_date, api_key)
+    do_sync(config.get('base','EUR'), start_date, api_key, httpType)
 
 
 if __name__ == '__main__':

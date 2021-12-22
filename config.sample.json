@@ -1,5 +1,6 @@
 {
     "start_date": "2017-02-02",
     "base": "EUR",
-    "api_key": ""
+    "api_key": "",
+    "secure" : false
 }
